@@ -76,7 +76,7 @@ final class ProgramCleanup {
             mouseHandler.cleanupCursors(renderer);
         }
 
-        disableMouse(renderer);
+        disableMouse(renderer, terminal);
 
         if (renderer.reportFocus()) {
             renderer.disableReportFocus();
@@ -110,11 +110,16 @@ final class ProgramCleanup {
         }
     }
 
-    private static void disableMouse(Renderer renderer) {
+    private static void disableMouse(Renderer renderer, Terminal terminal) {
         renderer.disableMouseSGRMode();
         renderer.disableMouseNormalTracking();
         renderer.disableMouseCellMotion();
         renderer.disableMouseAllMotion();
+        try {
+            terminal.trackMouse(Terminal.MouseTracking.Off);
+        } catch (RuntimeException ignored) {
+            // Best-effort: unsupported terminals keep the ANSI-only behavior.
+        }
     }
 }
 
